@@ -14,16 +14,15 @@ import java.util.Date;
 @Component
 public class JwtUtil {
     private final String SECRET = "SARAVANAN BEST DEVELOPER - NEW BACKEND LIBRARY PROJECT";
-    private final Long EXPIRATION = (long) 1000 * 60 * 60; //one hour
+    private final Long EXPIRATION = (long) 1000 * 60 * 60 * 24; //one day
     private final Key secretKey = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
-
 
     public String generateToken(String email){
         return Jwts.builder()
                 .subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION))
-                .signWith(secretKey)
+                .signWith((SecretKey) secretKey)
                 .compact();
     }
 
@@ -36,11 +35,11 @@ public class JwtUtil {
                 .getSubject();
     }
 
-    public Boolean verifyToken(String token){
+    public  Boolean verifyToken(String token){
         try{
             extractEmail(token);
             return true;
-        }catch (JwtException exception){
+        }catch(JwtException exception){
             return false;
         }
     }
