@@ -51,6 +51,12 @@ public class BookController {
 
     }
 
+    @GetMapping("/get/{id}")
+    public Book getBookByIdNew(@PathVariable Long id) {
+        return bookService.getBookById(id).orElse(null);
+    }
+
+
     @PostMapping("/create")
     public ResponseEntity<?> createBook(@RequestBody CreateBook createBook){
         String bookName = createBook.getBookName();
