@@ -22,4 +22,7 @@ public class User {
     private String email;
 
     private String password;
+
+    @Column(nullable = false, columnDefinition = "varchar(20) default 'USER'")
+    private String role = "USER"; // USER & ADMIN
 }

@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Data
 @Service
 public class BorrowService {
@@ -24,4 +26,17 @@ public class BorrowService {
     public Borrow borrowBook(Borrow borrow){
         return borrowRepository.save(borrow);
     }
+
+    public Boolean isAlreadyBorrowed(Long userId) {
+        return borrowRepository.findByUserIdAndIsReturnedFalse(userId).isPresent();
+    }
+
+    public Borrow returnBook(Long userId, Long bookId){
+        return borrowRepository.findByUserIdAndBookId(userId, bookId).map(borrow ->{
+            borrow.setIsReturned(true);
+            borrow.setReturnDate(LocalDate.now());
+            return borrowRepository.save(borrow);
+        }).orElse(null);
+    }
+
 }

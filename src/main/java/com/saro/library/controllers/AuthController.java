@@ -46,7 +46,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        User user = User.builder().email(email).password(password).build();
+        User user = User.builder().email(email).password(password).role("USER").build();
         userService.createUser(user);
 
         Map<String,Object> response = new HashMap<>();

@@ -13,4 +13,6 @@ public class RegisterUser {
 
     @NotNull(message = "Password is required")
     private String password;
+
+    private String role;
 }

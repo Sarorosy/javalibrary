@@ -1,7 +1,7 @@
 package com.saro.library.controllers;
 
-import com.github.andrewoma.dexx.collection.HashMap;
-import com.github.andrewoma.dexx.collection.Map;
+//import com.github.andrewoma.dexx.collection.HashMap;
+//import com.github.andrewoma.dexx.collection.Map;
 import com.saro.library.dto.BorrowBook;
 import com.saro.library.models.Borrow;
 import com.saro.library.models.User;
@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @Data
@@ -39,14 +41,23 @@ public class BorrowController {
         String token = authHeader.replace("Bearer ","").trim();
         String email = jwtUtil.extractEmail(token);
 
+        Map<String, Object> response = new HashMap<>();
+
         User user = userService.getUserByEmail(email);
+        if(borrowService.isAlreadyBorrowed(user.getId())){
+
+
+            response.put("status", false);
+            response.put("message", "User Book return pending.");
+
+            return ResponseEntity.badRequest().body(response);
+        }
         Long userId = user.getId();
 
         Long bookId = borrowBook.getBookId();
         LocalDate borrowDate = borrowBook.getBorrowDate();
         Integer borrowDays = borrowBook.getBorrowDays();
 
-        Map<String, Object> response = new HashMap<>();
 
         if (bookId == null || borrowDate == null || borrowDays == null) {
             response.put("status", false);
@@ -70,6 +81,40 @@ public class BorrowController {
         response.put("data", borrowed);
 
         return ResponseEntity.ok(response);  // ✅ always return the map
+    }
+
+    @PostMapping("/returnBook")
+    public ResponseEntity<?> returnBook(@RequestHeader("Authorization") String authHeader, @RequestBody BorrowBook borrowBookDto){
+        String token = authHeader.replace("Bearer ", "").trim();
+
+        String email = jwtUtil.extractEmail(token);
+
+        User user = userService.getUserByEmail(email);
+
+        Long bookId = borrowBookDto.getBookId();
+
+        Map<String, Object> response = new HashMap<>();
+
+        if(bookId == null){
+            response.put("status", false);
+            response.put("message", "bookId is required");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+
+        Borrow returned = borrowService.returnBook(user.getId(), bookId);
+
+        if(returned == null){
+            response.put("status", false);
+            response.put("message", "bookId, User Doesn't borrowed any Books");
+            return ResponseEntity.badRequest().body(response);
+        }else{
+            response.put("status", true);
+            response.put("message", "Book returned Successfully");
+            return ResponseEntity.ok(response);
+        }
+
+
     }
 
 
