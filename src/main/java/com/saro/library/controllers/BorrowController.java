@@ -104,6 +104,8 @@ public class BorrowController {
 
         Borrow returned = borrowService.returnBook(user.getId(), bookId);
 
+        bookService.increaseAvailableCount(bookId);
+
         if(returned == null){
             response.put("status", false);
             response.put("message", "bookId, User Doesn't borrowed any Books");

@@ -41,4 +41,16 @@ public class BookService {
                     return bookRepository.save(book);
                 }).orElseThrow(()->new IllegalArgumentException("Book Not Available with id " + id));
     }
+
+    public Book increaseAvailableCount(Long id) {
+        return bookRepository.findById(id).map(book -> {
+            if (book.getAvailableCopies() != null && book.getAvailableCopies() < book.getTotalCopies()) {
+                book.setAvailableCopies(book.getAvailableCopies() + 1);
+            }
+            if (book.getAvailableCopies() > 0) {
+                book.setIsAvailable(true);
+            }
+            return bookRepository.save(book);
+        }).orElseThrow(()->new IllegalArgumentException("Book Not Available with id " + id));
+    }
 }
